@@ -1776,11 +1776,13 @@ jobs:
             cxx_flags: "/Zc:preprocessor"
           }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Configure MSVC console (Windows)
         if: startsWith(matrix.config.os, 'windows')
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
 
       - name: Set MacOS compiler env
         id: set_macos_cc_cxx
@@ -1864,7 +1866,7 @@ jobs:
 
       - name: Upload coverage
         if: (!startsWith(matrix.config.name, 'windows') && !matrix.config.no_coverage) && github.repository == 'rollbear/trompeloeil'
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         with:
           name: "${{ matrix.config.name }}"
           fail_ci_if_error: false
