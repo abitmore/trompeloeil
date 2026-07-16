@@ -1717,60 +1717,60 @@ jobs:
 
           # MSVC 2019
           - {
-            name: "Windows MSVC 2019 C++11",
-            os: windows-2019,
+            name: "Windows MSVC 2025 C++11",
+            os: windows-2025,
             cc: "cl", cxx: "cl",
             cxx_standard: 11,
           }
           - {
-            name: "Windows MSVC 2019 C++11 preprocessor",
-            os: windows-2019,
+            name: "Windows MSVC 2025 C++11 preprocessor",
+            os: windows-2025,
             cc: "cl", cxx: "cl",
             cxx_standard: 11,
             cxx_flags: "/Zc:preprocessor"
           }
           - {
-            name: "Windows MSVC 2019 C++14",
-            os: windows-2019,
+            name: "Windows MSVC 2025 C++14",
+            os: windows-2025,
             cc: "cl", cxx: "cl",
             cxx_standard: 14,
           }
           - {
-            name: "Windows MSVC 2019 C++14 preprocessor",
-            os: windows-2019,
+            name: "Windows MSVC 2025 C++14 preprocessor",
+            os: windows-2025,
             cc: "cl", cxx: "cl",
             cxx_standard: 14,
             cxx_flags: "/Zc:preprocessor"
           }
           - {
-            name: "Windows MSVC 2019 C++17",
-            os: windows-2019,
+            name: "Windows MSVC 2025 C++17",
+            os: windows-2025,
             cc: "cl", cxx: "cl",
             cxx_standard: 17,
           }
           - {
-            name: "Windows MSVC 2019 C++17 preprocessor",
-            os: windows-2019,
+            name: "Windows MSVC 2025 C++17 preprocessor",
+            os: windows-2025,
             cc: "cl", cxx: "cl",
             cxx_standard: 17,
             cxx_flags: "/Zc:preprocessor"
           }
           - {
-            name: "Windows MSVC 2019 C++20",
-            os: windows-2019,
+            name: "Windows MSVC 2025 C++20",
+            os: windows-2025,
             cc: "cl", cxx: "cl",
             cxx_standard: 20,
           }
           - {
-            name: "Windows MSVC 2019 C++20 __cppstd",
-            os: windows-2019,
+            name: "Windows MSVC 2025 C++20 __cppstd",
+            os: windows-2025,
             cc: "cl", cxx: "cl",
             cxx_standard: 20,
             cxx_flags: "/Zc:__cplusplus"
           }
           - {
-            name: "Windows MSVC 2019 C++20 preprocessor",
-            os: windows-2019,
+            name: "Windows MSVC 2025 C++20 preprocessor",
+            os: windows-2025,
             cc: "cl", cxx: "cl",
             cxx_standard: 20,
             cxx_flags: "/Zc:preprocessor"
