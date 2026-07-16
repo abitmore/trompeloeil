@@ -154,6 +154,13 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
               " -Wno-reserved-identifier")
     endif()
 
+    if(CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
+      string(CONCAT
+              WARN_FLAGS
+              "-Wno-poison-system-directories"
+              " -Wno-float-equal")
+    endif()
+
   elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     string(CONCAT
             WARN_FLAGS

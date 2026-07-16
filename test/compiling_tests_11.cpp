@@ -133,7 +133,7 @@ namespace
   struct throwing_action
   {
     template <typename Matcher, typename modifier_tag, typename Parent>
-    static
+    [[noreturn]] static
     trompeloeil::call_modifier<Matcher, modifier_tag, Parent>&&
     action(
       trompeloeil::call_modifier<Matcher, modifier_tag, Parent>&&)
