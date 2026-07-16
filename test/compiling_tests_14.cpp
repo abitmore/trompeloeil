@@ -3297,6 +3297,54 @@ TEST_CASE_METHOD(Fixture, "ptr to equal value of different size matches deref", 
   REQUIRE(reports.empty());
 }
 
+namespace
+{
+  template <typename T>
+  struct optlike
+  {
+    T v;
+    bool has_v = false;
+
+    explicit operator bool() const { return has_v; }
+    const T& operator*() const { return v; }
+  };
+
+  struct optmock
+  {
+    MAKE_MOCK1(f, void(optlike<int>));
+  };
+}
+TEST_CASE_METHOD(Fixture, "pointer-like object can be dereferenced", "[matching][matchers][deref][eq]")
+{
+  {
+    optmock obj;
+    REQUIRE_CALL(obj, f(*trompeloeil::eq(3)));
+    obj.f({3, true});
+  }
+  REQUIRE(reports.empty());
+}
+
+TEST_CASE_METHOD(Fixture, "unset dereferenced pointer-like object reports", "[matching][matchers][deref][eq]")
+{
+  try {
+    optmock obj;
+    REQUIRE_CALL(obj, f(*trompeloeil::eq(3)));
+    obj.f({});
+    FAIL("didn't throw");
+  }
+  catch (reported)
+  {
+    REQUIRE(!reports.empty());
+    auto re = R":(No match for call of f with signature void\(optlike<int>\) with\.
+  param  _1 == .*
+
+Tried obj\.f\(\*trompeloeil::eq\(3\)\) at [A-Za-z0-9_ ./:\]*:[0-9]*.*
+  Expected \*_1 == 3):";
+    INFO(reports.front().msg);
+    REQUIRE(std::regex_search(reports.front().msg, std::regex(re)));
+
+  }
+}
 ////
 
 TEST_CASE_METHOD(Fixture, "unique_ptr value to equal value matches deref", "[matching][matchers][eq]")

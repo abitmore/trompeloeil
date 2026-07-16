@@ -1,3 +1,7 @@
+	* Dereferencing matcher, operator* can be used with pointer-like
+	  objects, e.g. std::optional<>. Thank you Mathias Stearn for
+	  reporting.
+
 	* Conditional support for non-awaitable coroutines, like std::generator.
 	  Thank you Artem Suleimanov for submitting the improvement.
 

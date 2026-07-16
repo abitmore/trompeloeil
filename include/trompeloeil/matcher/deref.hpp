@@ -42,9 +42,9 @@ public:
   matches(
     const U& u)
   const
-  noexcept(noexcept(std::declval<M>().matches(*u)))
+  noexcept(noexcept(static_cast<bool>(u)) && noexcept(std::declval<M>().matches(*u)))
   {
-    return (u != nullptr) && m.matches(*u);
+    return static_cast<bool>(u) && m.matches(*u);
   }
 
   friend
