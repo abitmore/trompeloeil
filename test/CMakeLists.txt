@@ -248,54 +248,54 @@ target_link_libraries(
 )
 
 
-find_package(Threads REQUIRED)
+find_package(Threads QUIET)
+if (Threads_FOUND)
+    add_executable(
+            thread_terror
+            thread_terror.cpp
+    )
 
-add_executable(
-        thread_terror
-        thread_terror.cpp
-)
+    target_link_libraries(
+            thread_terror
+            PUBLIC
+            trompeloeil
+            Threads::Threads
+    )
 
-target_link_libraries(
-        thread_terror
-        PUBLIC
-        trompeloeil
-        Threads::Threads
-)
+    if (SANITIZE)
+      set_target_properties(
+              thread_terror
+              PROPERTIES
+              LINK_FLAGS
+              ${TSAN}
+              COMPILE_FLAGS
+              ${TSAN}
+      )
+    endif()
 
-if (SANITIZE)
-  set_target_properties(
-          thread_terror
-          PROPERTIES
-          LINK_FLAGS
-          ${TSAN}
-          COMPILE_FLAGS
-          ${TSAN}
-  )
+    add_executable(
+            custom_recursive_mutex
+            custom_recursive_mutex.cpp
+    )
+
+    target_link_libraries(
+            custom_recursive_mutex
+            PUBLIC
+            trompeloeil
+            Threads::Threads
+    )
+
+    if (SANITIZE AND NOT APPLE)
+      set_target_properties(
+              custom_recursive_mutex
+              PROPERTIES
+              LINK_FLAGS
+              "${SSAN}"
+              COMPILE_FLAGS
+              ${SSAN}
+      )
+    endif()
 endif()
-
-add_executable(
-        custom_recursive_mutex
-        custom_recursive_mutex.cpp
-)
-
-target_link_libraries(
-        custom_recursive_mutex
-        PUBLIC
-        trompeloeil
-        Threads::Threads
-)
-
-if (SANITIZE AND NOT APPLE)
-  set_target_properties(
-          custom_recursive_mutex
-          PROPERTIES
-          LINK_FLAGS
-          "${SSAN}"
-          COMPILE_FLAGS
-          ${SSAN}
-  )
-endif()
-
 # Linker support for CXX_STDLIB argument
 if (NOT ("${CXX_STDLIB}" STREQUAL ""))
 
@@ -331,18 +331,20 @@ if (NOT ("${CXX_STDLIB}" STREQUAL ""))
               ${STDLIB_LINK_LIBRARIES}
       )
 
-      set_target_properties(
-              thread_terror
-              PROPERTIES
-              LINK_FLAGS
-              ${STDLIB_LINK_FLAGS}
-      )
+      if (Threads_FOUND)
+          set_target_properties(
+                  thread_terror
+                  PROPERTIES
+                  LINK_FLAGS
+                  ${STDLIB_LINK_FLAGS}
+          )
 
-      target_link_libraries(
-              thread_terror
-              PUBLIC
-              ${STDLIB_LINK_LIBRARIES}
-      )
+          target_link_libraries(
+                  thread_terror
+                  PUBLIC
+                  ${STDLIB_LINK_LIBRARIES}
+          )
+      endif()
 
       set_target_properties(
               custom_recursive_mutex
