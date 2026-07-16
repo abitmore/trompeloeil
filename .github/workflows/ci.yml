@@ -1789,7 +1789,7 @@ jobs:
         if: startsWith(matrix.config.os, 'macos')
         shell: bash
         run: |
-          env brew install parallel
+          env brew untap aws/tap && brew install parallel
           echo "CC=clang" >> $GITHUB_ENV
           echo "CXX=clang++" >> $GITHUB_ENV
 
