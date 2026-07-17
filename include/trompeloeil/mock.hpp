@@ -552,7 +552,14 @@ namespace trompeloeil {
     mini_span(T* address, size_t size) noexcept : begin_(address), end_(address + size) {}
     T* begin() const noexcept { return begin_; }
     T* end() const noexcept { return end_; }
+#if TROMPELOEIL_CLANG && TROMPELOEIL_CLANG_VERSION >= 220000
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#pragma clang diagnostic push
+#endif
     size_t size() const { return static_cast<size_t>(end_ - begin_); }
+#if TROMPELOEIL_CLANG && TROMPELOEIL_CLANG_VERSION >= 220000
+#pragma clang diagnostic pop
+#endif
   private:
     T* begin_;
     T* end_;
@@ -3433,8 +3440,15 @@ template <typename T>
 #define TROMPELOEIL_LINE_ID(name)                                        \
   TROMPELOEIL_CONCAT(trompeloeil_l_ ## name ## _, __LINE__)
 
+#if TROMPELOEIL_CLANG && TROMPELOEIL_CLANG_VERSION >= 220000
+#pragma clang diagnostic ignored "-Wc2y-extensions"
+#pragma clang diagnostic push
+#endif
 #define TROMPELOEIL_COUNT_ID(name)                                       \
   TROMPELOEIL_CONCAT(trompeloeil_c_ ## name ## _, __COUNTER__)
+#if TROMPELOEIL_CLANG && TROMPELOEIL_CLANG_VERSION >= 220000
+#pragma clang diagnostic pop
+#endif
 
 #if TROMPELOEIL_MSVC_PREPROCESSOR
 #define TROMPELOEIL_MAKE_MOCK0(name, sig, ...)                           \

@@ -40,7 +40,14 @@ struct regex_check
       const S& s)
     noexcept
       : begin_(s.data())
+#if TROMPELOEIL_CLANG && TROMPELOEIL_CLANG_VERSION >= 220000
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#pragma clang diagnostic push
+#endif
         , end_(begin_ + s.length())
+#if TROMPELOEIL_CLANG && TROMPELOEIL_CLANG_VERSION >= 220000
+#pragma clang diagnostic pop
+#endif
     {}
 
     constexpr
@@ -48,7 +55,14 @@ struct regex_check
       char const* s)
     noexcept
       : begin_(s)
+#if TROMPELOEIL_CLANG && TROMPELOEIL_CLANG_VERSION >= 220000
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#pragma clang diagnostic push
+#endif
         , end_(s ? begin_ + strlen(s) : nullptr)
+#if TROMPELOEIL_CLANG && TROMPELOEIL_CLANG_VERSION >= 220000
+#pragma clang diagnostic pop
+#endif
     {
     }
 
