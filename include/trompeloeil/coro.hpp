@@ -51,6 +51,11 @@ namespace trompeloeil
         return type_wrapper<decltype(std::declval<T>().operator co_await().await_resume())>{};
       }
       else
+      if constexpr (requires(T coro) { operator co_await(std::declval<T>()); })
+      {
+        return type_wrapper<decltype(operator co_await(std::declval<T>()).await_resume())>{};
+      }
+      else
       if constexpr (requires(T coro){ coro.await_resume(); })
       {
         return type_wrapper<decltype(std::declval<T>().await_resume())>{};

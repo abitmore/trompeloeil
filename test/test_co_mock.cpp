@@ -41,6 +41,10 @@ namespace {
     MAKE_MOCK1 (unique, coro::task<iptr>(iptr));
     MAKE_MOCK0 (gen, coro::generator<int>());
 
+    MAKE_MOCK0(free_intret, coro::co_await_task<int>());
+    MAKE_MOCK0(free_voidret, coro::co_await_task<void>());
+    MAKE_MOCK1(free_unique, coro::co_await_task<iptr>(iptr));
+
 #ifdef __cpp_lib_generator
     MAKE_MOCK0 (stdgen, std::generator<int>());
 #endif // __cpp_lib_generator
@@ -206,6 +210,92 @@ TEST_CASE_METHOD(
     std::invoke([&]() -> coro::task<void> { v = co_await p;});
     REQUIRE(v == 3);
     REQUIRE(reports.empty());
+}
+
+TEST_CASE_METHOD(
+    Fixture,
+    "A CO_RETURNed value is obtained from co_await with a free operator co_await",
+    "[coro]")
+{
+  co_mock m;
+  REQUIRE_CALL(m, free_intret()).CO_RETURN(3);
+
+  int x = 0;
+  std::invoke([&]() -> coro::task<void>
+              { x = co_await m.free_intret(); });
+
+  REQUIRE(x == 3);
+  REQUIRE(reports.empty());
+}
+
+TEST_CASE_METHOD(
+    Fixture,
+    "A void co_routine is CO_RETURNed with a free operator co_await",
+    "[coro]")
+{
+  co_mock m;
+  REQUIRE_CALL(m, free_voidret()).CO_RETURN();
+
+  int x = 0;
+  std::invoke([&]() -> coro::task<void>
+              { co_await m.free_voidret(); x = 3; });
+
+  REQUIRE(x == 3);
+  REQUIRE(reports.empty());
+}
+
+TEST_CASE_METHOD(
+    Fixture,
+    "A move-only type can be CO_RETURNed with a free operator co_await",
+    "[coro]")
+{
+  co_mock m;
+  REQUIRE_CALL(m, free_unique(_)).CO_RETURN(std::move(_1));
+  auto p = m.free_unique(std::make_unique<int>(3));
+  iptr x;
+  std::invoke([&]() -> coro::task<void>
+              { x = co_await p; });
+  REQUIRE(x);
+  REQUIRE(*x == 3);
+  REQUIRE(reports.empty());
+}
+
+TEST_CASE_METHOD(
+    Fixture,
+    "Exception from CO_THROW is thrown from co_await with a free operator co_await",
+    "[coro]")
+{
+  co_mock m;
+  REQUIRE_CALL(m, free_intret()).CO_THROW("foo");
+  auto p = m.free_intret();
+  int x = 0;
+  std::invoke([&]() -> coro::task<void>
+              {
+    REQUIRE_THROWS(co_await p);
+    x = 1; });
+  REQUIRE(x == 1);
+  REQUIRE(reports.empty());
+}
+
+TEST_CASE_METHOD(
+    Fixture,
+    "CO_YIELDed values are co_await:ed in order with CO_RETURN last with a free operator co_await",
+    "[coro]")
+{
+  co_mock m;
+  REQUIRE_CALL(m, free_intret()).CO_YIELD(1).CO_YIELD(2).CO_RETURN(0);
+  auto p = m.free_intret();
+  int v = 0;
+  std::invoke([&]() -> coro::task<void>
+              { v = co_await p; });
+  REQUIRE(v == 1);
+  std::invoke([&]() -> coro::task<void>
+              { v = co_await p; });
+  REQUIRE(v == 2);
+  std::invoke([&]() -> coro::task<void>
+              { v = co_await p; });
+  REQUIRE(v == 0);
+  REQUIRE(reports.empty());
 }
 
 #ifdef __cpp_lib_generator
