@@ -342,6 +342,91 @@ namespace coro
   }
 
   template <typename>
+  struct co_await_task;
+
+  template <typename T>
+  struct co_await_promise : promise<T>
+  {
+    co_await_task<T>
+    get_return_object() noexcept;
+  };
+
+  template <typename T>
+  struct co_await_task
+  {
+    using promise_type = co_await_promise<T>;
+
+    explicit co_await_task(std::coroutine_handle<promise_type> h = nullptr) : coroutine_(h) {}
+
+    co_await_task(co_await_task &&h) : coroutine_(std::exchange(h.coroutine_, nullptr)) {}
+
+    ~co_await_task()
+    {
+      if (coroutine_) {
+        coroutine_.destroy();
+      }
+    }
+
+    std::coroutine_handle<promise_type>
+    handle()
+      const
+      noexcept
+    {
+      return coroutine_;
+    }
+
+    promise_type &
+    promise()
+      const
+    {
+      return coroutine_.promise();
+    }
+
+  private:
+    std::coroutine_handle<promise_type> coroutine_;
+  };
+
+  template <typename T>
+  auto
+  operator co_await(const co_await_task<T> &t) noexcept
+  {
+    struct awaitable
+    {
+      bool
+      await_ready()
+        const
+        noexcept
+      {
+        return coroutine_.promise().has_data();
+      }
+
+      std::coroutine_handle<>
+      await_suspend(std::coroutine_handle<> next) noexcept
+      {
+        coroutine_.promise().continuation(next);
+        return coroutine_;
+      }
+
+      decltype(auto)
+      await_resume()
+      {
+        return coroutine_.promise().result();
+      }
+
+      std::coroutine_handle<co_await_promise<T>> coroutine_;
+    };
+    return awaitable{t.handle()};
+  }
+
+  template <typename T>
+  co_await_task<T>
+  co_await_promise<T>::get_return_object() noexcept
+  {
+    return co_await_task<T>{
+      std::coroutine_handle<co_await_promise>::from_promise(*this)};
+  }
+
+  template <typename>
   struct generator;
 
   template<typename T>
