@@ -3345,7 +3345,7 @@ template <typename T>
   template <bool movable, typename Sig>
   struct expectations
   {
-    expectations() = default;
+    expectations() noexcept = default;
     expectations(expectations&&) = default;
     ~expectations() {
       active.decommission();
@@ -3358,7 +3358,7 @@ template <typename T>
   template <typename Sig>
   struct expectations<false, Sig>
   {
-    expectations() = default;
+    expectations() noexcept = default;
     expectations(expectations&&)
     noexcept
     {
